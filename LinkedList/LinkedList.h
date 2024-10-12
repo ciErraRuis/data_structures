@@ -159,7 +159,6 @@ SingleLinkedList<T>& SingleLinkedList<T>::operator=(const SingleLinkedList<T> &_
     if (this == &_l)
         return *this;
     emptyList();
-
     _copy(_l);
     return *this;
 }

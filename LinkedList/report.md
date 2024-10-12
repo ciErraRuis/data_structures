@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <h1 align="center"> Report </h1>
 
 To improve the `remove()` function, which we hope it can remove both the nodes after it and itself, I think it's necessary to add some class member into `SingleLinkedList` class. Otherwise, we may need to do a search to find the previous node of `currentPos` which cost O(n) time.
@@ -6,6 +7,16 @@ To improve the `remove()` function, which we hope it can remove both the nodes a
  So similar to the double linked list, I added a `correntPrev` member which tracks the previous node. Besides `correntPrev`, I added a `sentinel` member which acts as the root of the list  and thus we can replace `head` with `sentinel->next`. Otherwise, there're many annoying corner cases to deal with. So the edition to the declaration of the class is like below:
 
 ```c++
+=======
+<h1 align="center"> Explanation </h1>
+
+To improve the `remove()` funtion, which we hope it can remove both the nodes after it and itself, I think it's necessary to add some class member into `SingleLinkedList` class. Otherwise, we may need to do a search to find the previous node of `currentPos` which cost O(n) time.
+
+### 1. decleration
+ So similar to the double linked list, I added a `correntPrev` member which tracks the previous node. 
+Besides `correntPrev`, I added a `sentinel` member which acts as the root of the list, and set head to the next of sentinel. Otherwise, there're many corner cases which are annoying to deal with. So the decleration of the class is changed like below:
+```
+>>>>>>> 55e02fbc805478c1406774f34829f6856dbe5999
 template <typename T>
 class SingleLinkedList
 {
@@ -13,12 +24,16 @@ private:
                       ......
     //NEW MEMEBERS
     + Node* currentPrev = nullptr;
+<<<<<<< HEAD
     
     - Node* head = nullptr;
+=======
+>>>>>>> 55e02fbc805478c1406774f34829f6856dbe5999
     + Node* sentinel = nullptr;
                       ......
 }
 ```
+<<<<<<< HEAD
 ### 2. (copy) constructor / deconstructor
 
 Because of the new sentinel for each list, we need to change almost every constructor. I first defined a helper function called `_insert()` , which takes a pointer of new node as the input and insert it after `correntPos`. 
@@ -167,3 +182,25 @@ Run the test program provided, the output is shown below. Notice that the last l
 And run valgrind on linux:
 
  <img src="C:\Users\cierra\AppData\Roaming\Typora\typora-user-images\image-20241013052832479.png" alt="image-20241013052832479" style="zoom:40%;" />
+=======
+### 2. constructor / deconstructor
+Accordingly, we need to initialize `sentinel` in the constructor and free in the deconstructor:
+```
+//constructor
+template<typename T>
+SingleLinkedList<T>::SingleLinkedList() {
+    sentinel = new Node(NULL);
+    sentinel->next = head;
+}
+//deconstructor
+template <typename T>
+void SingleLinkedList<T>::_emptyList()
+{
+    ......
+    if (sentinel != nullptr) 
+        delete sentinel;
+}
+```
+
+The rest of the code given in class can maintain the same.
+>>>>>>> 55e02fbc805478c1406774f34829f6856dbe5999
