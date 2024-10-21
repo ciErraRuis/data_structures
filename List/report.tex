@@ -1,0 +1,104 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+
+\lstset{
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{颜瑞, 3210102064}
+\chead{数据结构与算法第四次作业}
+\rhead{Oct.21st, 2024}
+
+\section{测试程序的设计思路}
+
+首先本次测试我们需要测试以下功能的正确性：
+
+1. constructor, copy constructor, move constructor, deconstructor
+
+2. copy assignment, move assignment
+
+3. 前后插入,删除
+
+4. front, back
+
+5. ++ / --
+
+6. 解引用(*)
+
+7. == / !=
+
+8. 不同模板类
+
+\vspace{\baselineskip}
+
+
+测试方法分别如下：
+
+1. constructor: 初始化一个初始值为1，2的链表b，打印b看是否符合预期。
+
+2. copy constructor: 通过拷贝b构造一个链表c。打印c看是否符合预期。再修改b的front和back后再次打印c。若c无变化则正确。
+
+3. copy assignment: 先初始化一个链表a，再将b拷贝赋值给a。打印a和b。再修改b，若a无变化则正确。
+
+4. move constructor: 通过a移动构造一个链表d。打印d的值，并查看a是否为empty。若a的值成功赋给了e且a为空则正确。
+
+5. move assignment: 将构造换为赋值后同上。
+
+6. deconstructor: 用valgrind检查是否存在内存泄漏。
+
+7. push\_front/back, pop\_front/back: 在修改b时使用这四个函数并检查结果是否符合预期。
+
+8. front, back: 用front, back输出push\_front/back的结果。
+
+9. *, ++, --: 将b.begin()赋值给一个iterator it，分别输出$*it++$, $*++it$, $*--it$, $*it--$，并在每次执行完后输出*it。观察是否符合预期。
+
+10. 模板类: 初始化一个模板类为std::string的链表f，push\_front插入"runis", push\_back插入"cierra"， 打印f若输出"cierra runis"则正确。
+
+11. != / ==: 由于!=等于==取反，只需测试==的正确性。在3.中将b拷贝赋值给a后，输出$a.begin() == b.begin()$。由于iterator的==输出的是是否指向同一node，所以虽然此时二者node的值相等，结果仍应该为0。
+   接着测试$b.begin() == b.begin()$应该输出1。最后，给一个iterator it1 赋值为b.begin()，将b.begin()修改后测试$it1 == b.begin()$，应该为1。
+
+\section{测试的结果}
+
+   测试结果一切正常。
+   
+   我用 valgrind 进行测试，发现没有发生内存泄露。
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
