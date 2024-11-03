@@ -27,7 +27,7 @@ int main() {
     //front, back
     std::cout << "Change b. Test front, back:" << std::endl;
     std::cout << b.front() << " " << b.back() << std::endl;
-    //*(b.back()) = 514;
+    //std::cout << b.back() << std::endl;
     std::cout << "test whether a is also changed with b: " << std::endl;
     std::cout << "a = ";
     a.display();

@@ -1,0 +1,154 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+\usepackage{xcolor}
+
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{颜瑞, 3210100264}
+\chead{数据结构与算法第五次作业}
+\rhead{Nov.3rd, 2024}
+
+\section{remove函数的设计思路}
+
+为了避免复制的开销，我们可以在找到右子树中最左侧的节点或是左子树中最右侧的节点替换要删除的节点，这里我选择了右子树中最左侧的节点。
+具体过程为：
+\begin{enumerate}
+    \item 首先，从节点位置找到右子树最左侧节点N，过程中记录N的父节点，将父节点的左儿子指向N的右儿子。
+    \item 然后，将待删除节点R的父节点指向的儿子节点替换为N，将N的左右儿子分别设为R的左右儿子。
+    \item 释放R。
+\end{enumerate}
+\par 代码如下：
+
+\lstset{language=C++} % 设置代码语言为 Python
+\begin{lstlisting}
+    BinaryNode* _detachRightMin(BinaryNode* t) {
+        BinaryNode* curr = t->right;
+        BinaryNode* parent = t;
+        while (curr->left) {
+            parent = curr;
+            curr = curr->left;
+        }
+        //detach
+        if (parent == t) {
+            t->right = nullptr;
+        } else {
+            parent->left = curr->right;
+        }
+        return curr;
+    }
+
+    void _remove(const Comparable &x, BinaryNode * t, BinaryNode * parent) {
+        /// 这个逻辑其实是 find and remove, 从 t 开始
+        if (t == nullptr) {
+            return;  /// 元素不存在
+        }
+    
+        if (x < t->element) {
+            _remove(x, t->left, t);
+        } else if (x > t->element) {
+            _remove(x, t->right, t);
+        } 
+        /// 进入以下这两个分支，都是说明找到了要删除的元素
+        
+        else if (t->left != nullptr && t->right != nullptr) {  /// 有两个子节点
+            BinaryNode* rightMin = _detachRightMin(t);
+            if (parent) {
+                if (parent->left == t) {
+                    parent->left = rightMin;
+                } else {
+                    parent->right = rightMin;
+                }
+            }
+            rightMin->left = t->left;
+            rightMin->right = t->right;
+            if (t == root) {
+                root = rightMin;
+            }
+            delete t;
+        } else {
+            /// 有一个或没有子节点的情形是简单的
+            BinaryNode* child = t->left ? t->left : t->right;
+            if (parent) {
+                //not root
+                if (t == parent->left) {
+                    parent->left = child;
+                } else {
+                    parent->right = child;
+                }
+            } else {
+                //root
+                root = child;
+            }
+            
+            delete t;
+        }
+    }
+
+    void remove(const Comparable &x, BinaryNode * &t) {
+        _remove(x, root, nullptr);
+    }
+\end{lstlisting}
+
+
+\par 有两个可能可以改进的地方：
+\begin{enumerate}
+    \item 为了方便起见，我没有使用指针的引用作为参数，并且在find的过程中记录下了待删除节点的父节点。
+    \item remove和detachRightMin的过程中都对是否为根节点做了特殊判断。
+\end{enumerate}
+
+\section{测试程序}
+本main函数在课堂测试程序的基础上针对remove函数进行了一些修改，总共测试了三种不同的情况：
+\begin{enumerate}
+    \item 删除根节点。
+    \item 删除有左右两个子节点的节点。
+    \item 删除有一个子节点的节点。
+    \item 删除叶子节点。
+\end{enumerate}
+\par 具体过程可以RTSC
+
+\section{测试的结果}
+
+\par 删除后的中序遍历结果皆正确。另外我定义了一个名为level\_order\_display的函数可以输出层序遍历的结果以方便查看树的结构，观察结果同样正确。
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
