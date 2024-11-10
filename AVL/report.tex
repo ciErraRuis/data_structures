@@ -1,0 +1,68 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{颜瑞, 3210102064}
+\chead{数据结构与算法第六次作业}
+\rhead{Nov.10th, 2024}
+
+\section{remove函数的设计思路}
+
+\par 为了实现avl树的remove，我们需要记录每个节点的高度，并在每次进行可能改变高度的操作时进行检查与更新。
+对remove来说，具体就是找到替代删除节点的节点并从树中分离时需要检查更新路径上的高度，必要时进行旋转。
+这个操作通过递归实现较为方便。
+
+\par 而当高度差大于1时，我们需要根据节点相对位置进行旋转操作。总共有四种情况，两两对称，可以很简单地分别实现出来。删除时根据if判断
+分别给出相应的旋转操作即可。具体参照BST.h中的balance函数。
+
+\par 另外，为了确保正确性，代码中可能存在重复的检查、更新操作，对性能可能会产生一定的影响。但因为没有超时，所以没有\sout{（懒得）}进行优化。
+
+\section{测试的结果}
+
+\par 因为一开始没看清作业要求，我把AVL的insert也实现了出来，所以测试时使用的也是该insert函数。
+用ubuntu22.04虚拟机11.4.0版本的g++编译运行给出的测试程序，测试结果无异常，运行时长为1s左右，内存无泄漏。
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
