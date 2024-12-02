@@ -1,0 +1,94 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{颜瑞, 3210102064}
+\chead{数据结构与算法第七次作业}
+\rhead{Dec.1st, 2024}
+
+\section{Heap的设计思路}
+
+\par 之前在某个课的作业中自己实现过二叉堆、斜堆、二项队列和斐波那契堆四种优先队列并在某数据集上进行了测试，结果发现斜堆性能比较优秀，故本次选择斜堆实现heapsort。
+为了满足优先队列的常规操作decreaseKey，堆的节点维护了父节点的指针，并且为了快速定位节点位置额外维护了一个下标到节点指针的哈希表。这对本次作业的排序需求来说是非必要的，
+因此可能会一定程度上影响性能。
+
+\par 本次实验主要用到了两个函数：insert()和pop()。而对斜堆来说，这两个函数实现上都依赖merge()函数。merge()函数输入两个斜堆的根节点，将两个堆合并后返回新的根节点。
+斜堆的merge实现非常简单。以小跟堆为例，只需要递归将节点值更大的堆和另一个的右子堆合并，并在最后交换两个子堆即可。实现完merge后，insert即将子节点merge进原堆，deleteMin
+即将根节点删除后merge左右子堆。
+
+
+\section{Heapsort的设计思路}
+
+\par 另外，我写了一个模板类Heapsort<Heap, T>用来使用不同的Heap结构对不同的数据类型进行排序。sort成员函数会将输入的vector的所有值排序好存储在heap成员变量当中，
+最后只需不断在heap中pop()即可得到排序结果。Heapsort中同样提供了check()函数来检查排序的正确性。具体来说就是不断地pop后检查节点是否都大于等于前一节点的值。虽然这样会
+清空堆，但因为没有保存的需要，这里就不多设计了。
+
+\section{检验的设计思路}
+
+\par 我写了一个Check类用来测试Sort的结果。简单起见，Check仅支持int类型。Check中存储了一个vector成员变量array，可以调用prepareData函数进行相应规模、模式的数据的生成。具体而言有RANDOM, INCREASE, DECREASE和REPEAT四种，对应评分要求中的
+四种测试情景。RANDOM即随机生成N个数。INCREASE和DECREASE分别将1-n的整数以升序/降序存入array中。REPEAT则以非严格递增的方式放入n个数。生成后分别使用Heap和标准库的Sort方法排序并计时即可。
+
+\section{实验结果}
+
+\par 以1000000的scale进行测试，测试结果大致如下：
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    \textbf{}  & \textbf{my heapsort time} & \textbf{std::sort\_heap time}   \\ \hline
+    random sequence     & 0.191729         & 0.0699911           \\ \hline
+    ordered sequence    & 0.111284         & 0.029461            \\ \hline
+    reverse sequence    & 0.0320638        & 0.0323049           \\ \hline
+    repetitive sequence & 0.104876         & 0.0291722           \\ \hline
+    \end{tabular}
+    \caption{Sample Table}
+\end{table}
+\par 可以看到性能差距还是挺大的。理论时间复杂度上而言二者都是$\mathcal{O}(N \log N)$。首先一个差距的来源可能在于我的实现中每次创建新节点
+都需要保存进一个unordered\_map，即哈希表中。大规模数据容易产生键的冲突导致存储效率降低。其次我猜测标准库中对应不同的数据规模会使用不同的堆结构来进行排序，可能heap\_sort使用的
+的并不是斜堆，再加上某些实现上的不明优化，导致效率更高。
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
