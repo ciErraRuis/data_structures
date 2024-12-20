@@ -60,10 +60,10 @@
 \section{Expression类}
 
 \par 本程序设计了Expression类用于处理输入与计算。Expression类要求输入一个字符串进行初始化，并且出于处理方便起见，在初始化时会将字符串中的空格全部删除。
-Expression类有eval()和get_result()两个public类函数。eval()会对表达式进行运算，若合法则会将结果保存在成员变量result中并返回true，否则返回false。
-get_result则可返回当前变量中存储的result。
+Expression类有eval()和get\_result()两个public类函数。eval()会对表达式进行运算，若合法则会将结果保存在成员变量result中并返回true，否则返回false。
+get\_result则可返回当前变量中存储的result。
 
-\par eval函数中最复杂的地方为处理操作数的读取，对应_compose_num函数。因为表达式总共只需扫描一遍，整个_compose_num函数与其辅助函数共享一个指针i，停留在每一步读取数的最后一位处。
+\par eval函数中最复杂的地方为处理操作数的读取，对应\_compose\_num函数。因为表达式总共只需扫描一遍，整个\_compose\_num函数与其辅助函数共享一个指针i，停留在每一步读取数的最后一位处。
 我们可以先读取整数部分，若后续存在.与e则进一步进行处理。大致的流程为依次读取整数部分->若i+1处为小数点，则读取小数部分->若i+1处为e，则读取科学计数法。同时，因为需要返回是否合法，该函数即
 其辅助函数均需要传入指针以保存结果。
 
