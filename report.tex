@@ -1,0 +1,86 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{颜瑞, 3210102064}
+\chead{四则混合计算器}
+\rhead{Dec.20th, 2024}
+
+\section{计算器的基本设计思路}
+
+\par 我们使用两个栈来处理表达式的计算，一个用来存放数，记为nums，另一个用来存放运算符，记为ops。从前往后依次处理字符：若为当前位为数字，则继续向后读取字符组成数字，途中若判断非法则返回false；
+若为运算符，则将当前ops中所有运算优先级大于等于当前运算符的运算符与相应的两个数取出、运算后放回栈中，并将该运算符放入栈中。对于括号，我使用了一个变量cnt记录当前应配对的左括号的个数。若为左括号，则cnt++；
+若为右括号，先判断当前cnt是否为0，若为0则表达式非法，否则需要不断进行计算操作直到ops弹出第一个左括号。
+
+\section{合法表达式的判别}
+
+\par 本程序的合法表达式规则同项目要求一致，能够识别识别非法的表达式，如括号不匹配、运算符连续使用、表达式以运算符开头或结尾以及除数是 0 等。同时，本程序考虑了负数，比如：1+-2.1, 1-------2是合法的，但 1++2.1 是非法的。
+具体的处理方法是当遇见连续的运算符时判断后者是否为-，若是则视为将后面的数乘以-1并continue。对于表达式开头的-号，我选择的是在eval最开头进行判断，若为-号则在nums和ops中分别添加0，'+'。
+本程序还考虑了科学计数法，比如：-1+2e2是合法的，但11e2与1e-2.2是非法的。
+
+\section{Expression类}
+
+\par 本程序设计了Expression类用于处理输入与计算。Expression类要求输入一个字符串进行初始化，并且出于处理方便起见，在初始化时会将字符串中的空格全部删除。
+Expression类有eval()和get_result()两个public类函数。eval()会对表达式进行运算，若合法则会将结果保存在成员变量result中并返回true，否则返回false。
+get_result则可返回当前变量中存储的result。
+
+\par eval函数中最复杂的地方为处理操作数的读取，对应_compose_num函数。因为表达式总共只需扫描一遍，整个_compose_num函数与其辅助函数共享一个指针i，停留在每一步读取数的最后一位处。
+我们可以先读取整数部分，若后续存在.与e则进一步进行处理。大致的流程为依次读取整数部分->若i+1处为小数点，则读取小数部分->若i+1处为e，则读取科学计数法。同时，因为需要返回是否合法，该函数即
+其辅助函数均需要传入指针以保存结果。
+
+\section{检验的设计思路}
+
+\par 据我所知，C++的标准库中不存在像python那样直接解析字符串的函数，所以在不借助其他库的情况下应该无法生成随机表达式大规模检测程序的正确性。因此本测试程序仅通过手动输入表达式与其预期结果
+来检测程序的正确性。具体来说，我分别对合法的表达式和非法的表达式进行了测试。程序的最后会输出成功的测试点与失败的测试点的个数。本想借助LLM扩充一下测试点范围，但chatgpt似乎并没有办法很好地推理四则运算，
+遂作罢。两种可以选择的改进方式是: 1.借用三方库eval字符串。2.利用python在本地生成测试点与正确结果，并在测试程序中读入并比较结果。
+
+
+\section{实验结果}
+
+\par 在最外层目录输入make run可以运行计算器。输入make test可以进行测试。测试点全部通过。（浮点数计算的误差设置在了1e-9内）。
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
